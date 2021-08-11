@@ -1,11 +1,10 @@
 package shoppingcommandservice.shoppingcommandservice.data;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import shoppingcommandservice.shoppingcommandservice.domain.ShoppingCart;
+import shoppingcommandservice.shoppingcommandservice.domain.ShoppingCartEvent;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface ShoppingCartRepository extends MongoRepository<ShoppingCart, String> {
-    List<ShoppingCart> findByCartNumber(String cartNumber);
+public interface ShoppingCartRepository extends MongoRepository<ShoppingCartEvent, String> {
+    List<ShoppingCartEvent> findByCartNumber(String cartNumber);
 }

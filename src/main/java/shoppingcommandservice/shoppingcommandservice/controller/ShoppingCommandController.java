@@ -1,13 +1,11 @@
 package shoppingcommandservice.shoppingcommandservice.controller;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import shoppingcommandservice.shoppingcommandservice.domain.ShoppingCart;
+import shoppingcommandservice.shoppingcommandservice.domain.ShoppingCartEvent;
 import shoppingcommandservice.shoppingcommandservice.service.ShoppingService;
 import shoppingcommandservice.shoppingcommandservice.service.dtos.CartLineDTO;
 
@@ -66,7 +64,7 @@ public class ShoppingCommandController {
 
     @DeleteMapping("/shopping-command/{cartNumber}/{productNumber}")
     public ResponseEntity<String> removeFromCart(@PathVariable String cartNumber, @PathVariable String productNumber, @RequestHeader(value="Customer-ID") String customerId) {
-        ShoppingCart cart = shoppingService.findByCartNumber(cartNumber);
+        ShoppingCartEvent cart = shoppingService.findByCartNumber(cartNumber);
         if (cart == null) return new ResponseEntity<String>("Cart no found", HttpStatus.NOT_FOUND);
 
         shoppingService.removeFromCart(cartNumber, productNumber, customerId);

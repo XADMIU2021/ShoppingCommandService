@@ -3,12 +3,10 @@ package shoppingcommandservice.shoppingcommandservice.integration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import shoppingcommandservice.shoppingcommandservice.domain.CartCheckoutEvent;
 import shoppingcommandservice.shoppingcommandservice.domain.ProductAddedEvent;
 import shoppingcommandservice.shoppingcommandservice.domain.ProductRemovedEvent;
 import shoppingcommandservice.shoppingcommandservice.domain.ProductUpdatedEvent;
-import shoppingcommandservice.shoppingcommandservice.domain.ShoppingCart;
-import shoppingcommandservice.shoppingcommandservice.service.dtos.ShoppingCartDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service

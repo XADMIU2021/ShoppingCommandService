@@ -2,7 +2,11 @@ package shoppingcommandservice.shoppingcommandservice.domain;
 
 import org.springframework.data.annotation.Id;
 
-public class ShoppingCart {
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class ShoppingCartEvent {
     @Id
     private String id;
 
@@ -11,13 +15,15 @@ public class ShoppingCart {
     private int quantity;
     private String customerId;
     private String eventType;
+    private String timeStamp;
 
-    public ShoppingCart(String cartNumber, String productNumber, int quantity, String customerId, String eventType) {
+    public ShoppingCartEvent(String cartNumber, String productNumber, int quantity, String customerId, String eventType) {
         this.cartNumber = cartNumber;
         this.productNumber = productNumber;
         this.quantity = quantity;
         this.customerId = customerId;
         this.eventType = eventType;
+        this.timeStamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     public String getId() {
@@ -42,5 +48,9 @@ public class ShoppingCart {
 
     public String getEventType() {
         return eventType;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
     }
 }

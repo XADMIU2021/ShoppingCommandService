@@ -1,7 +1,9 @@
 package shoppingcommandservice.shoppingcommandservice.service;
 
+import com.sun.tools.javac.comp.Check;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import shoppingcommandservice.shoppingcommandservice.data.CheckoutEventRepository;
 import shoppingcommandservice.shoppingcommandservice.data.ShoppingCartRepository;
 import shoppingcommandservice.shoppingcommandservice.domain.*;
 import shoppingcommandservice.shoppingcommandservice.integration.KafkaSender;
@@ -15,6 +17,9 @@ public class ShoppingService {
     private ShoppingCartRepository repository;
 
     @Autowired
+    private CheckoutEventRepository eventRepository;
+
+    @Autowired
     private ShoppingAdapter adapter;
 
     @Autowired
@@ -24,7 +29,7 @@ public class ShoppingService {
     private KafkaSender sender;
 
     public void addToCart(String cartNumber, CartLineDTO dto, String customerId) {
-        ShoppingCart cart = domainService.addToCart(cartNumber, dto, customerId);
+        ShoppingCartEvent cart = domainService.addToCart(cartNumber, dto, customerId);
         repository.save(cart);
 
         // send cart as kafka event message
@@ -32,15 +37,15 @@ public class ShoppingService {
         sender.sendProductAdded("product-added", event);
     }
 
-    public ShoppingCart findByCartNumber(String cartNumber) {
-        List<ShoppingCart> carts = repository.findByCartNumber(cartNumber);
+    public ShoppingCartEvent findByCartNumber(String cartNumber) {
+        List<ShoppingCartEvent> carts = repository.findByCartNumber(cartNumber);
         if (carts == null || carts.size() == 0) return null;
 
         return carts.get(0);
     }
 
     public void removeFromCart(String cartNumber, String productNumber, String customerId) {
-        ShoppingCart cartEvent = domainService.removeFromCart(cartNumber, productNumber, customerId);
+        ShoppingCartEvent cartEvent = domainService.removeFromCart(cartNumber, productNumber, customerId);
         repository.save(cartEvent);
 
         ProductRemovedEvent event = new ProductRemovedEvent(cartNumber, productNumber, customerId);
@@ -48,7 +53,7 @@ public class ShoppingService {
     }
 
     public void updateProduct(String cartNumber, CartLineDTO dto, String customerId) {
-        ShoppingCart cart = domainService.updateFromCart(cartNumber, dto, customerId);
+        ShoppingCartEvent cart = domainService.updateFromCart(cartNumber, dto, customerId);
         repository.save(cart);
 
         // send cart as kafka event message
@@ -56,4 +61,8 @@ public class ShoppingService {
         sender.sendProductUpdated("product-updated", event);
     }
 
+    public void handleCheckout(CartCheckoutEvent event) {
+        CheckoutEvent checkoutEvent = new CheckoutEvent(event.getCustomerId(), event.getCartNumber());
+        eventRepository.save(checkoutEvent);
+    }
 }
