@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: ShoppingCommandService
+  cloud:
+    config:
+      uri: http://localhost:8099
