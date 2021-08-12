@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import shoppingcommandservice.shoppingcommandservice.domain.CartCheckoutEvent;
+import shoppingcommandservice.shoppingcommandservice.service.CustomLoggerService;
 import shoppingcommandservice.shoppingcommandservice.service.ShoppingService;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +15,13 @@ public class KafkaReceiver {
     @Autowired
     private ShoppingService service;
 
+    @Autowired
+    private CustomLoggerService loggerService;
+
     @KafkaListener(topics = {"cart-checkout"})
     public void receiveCheckout(@Payload String message) {
         System.out.println("Receiver received cart checkout message = "+ message);
+        loggerService.log("Receive checkout event : " + message);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             CartCheckoutEvent event = objectMapper.readValue(message, CartCheckoutEvent.class);

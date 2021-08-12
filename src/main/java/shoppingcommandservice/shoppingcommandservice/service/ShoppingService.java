@@ -28,6 +28,9 @@ public class ShoppingService {
     @Autowired
     private KafkaSender sender;
 
+    @Autowired
+    private CustomLoggerService loggerService;
+
     public void addToCart(String cartNumber, CartLineDTO dto, String customerId) {
         ShoppingCartEvent cart = domainService.addToCart(cartNumber, dto, customerId);
         repository.save(cart);
@@ -64,5 +67,6 @@ public class ShoppingService {
     public void handleCheckout(CartCheckoutEvent event) {
         CheckoutEvent checkoutEvent = new CheckoutEvent(event.getCustomerId(), event.getCartNumber());
         eventRepository.save(checkoutEvent);
+        loggerService.log("Cart with number " + event.getCartNumber() + " is checked out");
     }
 }

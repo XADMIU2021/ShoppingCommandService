@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shoppingcommandservice.shoppingcommandservice.domain.ShoppingCartEvent;
+import shoppingcommandservice.shoppingcommandservice.service.CustomLoggerService;
 import shoppingcommandservice.shoppingcommandservice.service.ShoppingService;
 import shoppingcommandservice.shoppingcommandservice.service.dtos.CartLineDTO;
 
@@ -17,6 +18,9 @@ public class ShoppingCommandController {
     @Autowired
     private ShoppingService shoppingService;
 
+    @Autowired
+    private CustomLoggerService loggerService;
+
     @PostMapping("/shopping-command/add-to-cart/{cartNumber}")
     public ResponseEntity<String> addToCart(@PathVariable String cartNumber, @RequestBody CartLineDTO dto, @RequestHeader(value="Customer-ID") String customerId) {
         // check stock from product service
@@ -26,10 +30,14 @@ public class ShoppingCommandController {
         } catch (Exception ex) {
             return new ResponseEntity<String>("Not enough product in stock", HttpStatus.OK);
         }
-        if (quantity < dto.getQuantity()) return new ResponseEntity<String>("Not enough product in stock", HttpStatus.OK);
+        if (quantity < dto.getQuantity()) {
+            loggerService.log("Not enough product in stock amount : " + quantity);
+            return new ResponseEntity<String>("Not enough product in stock", HttpStatus.OK);
+        }
 
         // store event in database
         shoppingService.addToCart(cartNumber, dto, customerId);
+        loggerService.log("product with product number : " + dto.getProductNumber() + " added to cart number : " + cartNumber);
         return new ResponseEntity<String>("Product added to cart successfully", HttpStatus.OK);
     }
 
@@ -46,6 +54,7 @@ public class ShoppingCommandController {
 
         // store event in database
         shoppingService.updateProduct(cartNumber, dto, customerId);
+        loggerService.log("product with product number : " + dto.getProductNumber() + " updated to cart number : " + cartNumber);
         return new ResponseEntity<String>("Product quantity updated on cart successfully", HttpStatus.OK);
     }
 
@@ -68,6 +77,7 @@ public class ShoppingCommandController {
         if (cart == null) return new ResponseEntity<String>("Cart no found", HttpStatus.NOT_FOUND);
 
         shoppingService.removeFromCart(cartNumber, productNumber, customerId);
+        loggerService.log("product with product number : " + productNumber + " removed from cart number : " + cartNumber);
         return new ResponseEntity<String>("Product removed from cart successfully", HttpStatus.OK);
     }
 }

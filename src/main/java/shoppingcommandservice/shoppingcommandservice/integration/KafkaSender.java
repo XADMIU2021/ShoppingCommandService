@@ -37,4 +37,8 @@ public class KafkaSender {
             kafkaTemplate.send(topic, resultAsString);
         } catch(Exception ex) {}
     }
+
+    public void logToKafka(String message) {
+        kafkaTemplate.send("webstore-log", message);
+    }
 }
